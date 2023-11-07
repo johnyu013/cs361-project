@@ -112,7 +112,7 @@ function App() {
         </form>
 
         <p>
-          © John Tran
+          © John Tran <a href="https://github.com/johnyu013/cs361-project">Update Logs</a>
         </p>
       </header>
     </div>
