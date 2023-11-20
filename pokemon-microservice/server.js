@@ -1,10 +1,12 @@
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 
 const app = express();
 const port = 3001;
 
 app.use(express.json());
+app.use(cors());
 
 app.get('/pokemon/:name', async (req, res) => {
   const { name } = req.params;
@@ -13,15 +15,18 @@ app.get('/pokemon/:name', async (req, res) => {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
     const pokemon = response.data;
 
-    console.log('Pokemon Data:', pokemon);
+    // console.log('Pokemon Data:', pokemon);
 
     // Check if the response includes the expected properties
     if (pokemon.sprites && pokemon.sprites.front_default) {
+      const nameData = pokemon.name;
       const imageData = pokemon.sprites.front_default;
 
+      console.log(nameData); // Log the Pokemon name
       console.log(imageData); // Log the image URL
 
       res.json({
+        name: nameData,
         image: imageData,
         // Add more relevant data if needed
       });
@@ -30,6 +35,7 @@ app.get('/pokemon/:name', async (req, res) => {
       console.error('Unexpected response structure from PokeAPI:', pokemon);
       res.status(500).json({ error: 'Internal Server Error' });
     }
+    
   } catch (error) {
     console.error('Error fetching data from PokeAPI:', error);
 
