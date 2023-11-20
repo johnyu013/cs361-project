@@ -17,7 +17,7 @@ app.get('/pokemon/:name', async (req, res) => {
 
     // Check if the response includes the expected properties
     if (pokemon.sprites && pokemon.sprites.front_default) {
-      var imageData = pokemon.sprites.front_default;
+      const imageData = pokemon.sprites.front_default;
 
       console.log(imageData); // Log the image URL
 

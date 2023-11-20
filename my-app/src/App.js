@@ -8,7 +8,7 @@ function App() {
   // State to hold the value of the health input
   const [healthValue, setHealthValue] = useState(100);
   // State to hold the Pokemon data, including the image URL
-  const [pokemonData, setPokemonData] = useState(null);
+  const [pokemonData, setPokemonData] = useState('');
 
   // Function to update the health range input when the number input changes
   const updateRangeFromNumber = (value) => {
