@@ -1,9 +1,14 @@
+// App.js
+
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 function App() {
   // State to hold the value of the health input
   const [healthValue, setHealthValue] = useState(100);
+  // State to hold the Pokemon data, including the image URL
+  const [pokemonData, setPokemonData] = useState(null);
 
   // Function to update the health range input when the number input changes
   const updateRangeFromNumber = (value) => {
@@ -26,14 +31,36 @@ function App() {
     }
   };
 
-  // Set up an event listener to update the number input when the range input changes
-  useEffect(() => {
-    const healthRange = document.getElementById("healthRange");
-    healthRange.addEventListener("input", updateNumberFromRange);
-    return () => {
-      healthRange.removeEventListener("input", updateNumberFromRange);
-    };
-  }, []);
+useEffect(() => {
+  const pokemonInput = document.getElementById("pokemonInput");
+
+  const handleInputBlur = async () => {
+    const pokemonName = pokemonInput.value.trim();
+    if (pokemonName !== '') {
+      try {
+        const response = await axios.get(`http://localhost:3001/pokemon/${pokemonName.toLowerCase()}`);
+        
+        setPokemonData({
+          image: response.data.image,
+          // Add other properties as needed
+        });
+      } catch (error) {
+        console.error('Error fetching Pokemon data:', error);
+        setPokemonData(null);
+      }
+    } else {
+      setPokemonData(null);
+    }
+  };
+
+  pokemonInput.addEventListener("blur", handleInputBlur);
+
+  return () => {
+    pokemonInput.removeEventListener("blur", handleInputBlur);
+  };
+}, []); // The empty dependency array means this effect will run once on component mount
+
+
 
   // State to hold the value of the level input
   const [levelValue, setLevelValue] = useState(1);
@@ -52,11 +79,16 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>
-          <strong>Pokemon Catch Rate Calculator</strong>
+          <strong>Heavy Slam!</strong>
         </h1>
         <form>
           <label>Pokemon</label> <label>Level</label><br></br>
-          <input type="text" name="pokemon" placeholder="Example: Bulbasaur"/>
+          <input
+            type="text"
+            name="pokemon"
+            placeholder="Example: Bulbasaur"
+            id="pokemonInput"  // Add an id for the Pokemon name input
+          />
           <input
             type="number"
             name="level"
@@ -66,7 +98,7 @@ function App() {
             onInput={(e) => updateLevelValue(parseInt(e.target.value, 10))}
           /> <br></br>
 
-          <label for="health">Health %</label> <br></br>
+          <label htmlFor="health">Health %</label> <br></br>
           <input
             type="range"
             id="healthRange"
@@ -87,7 +119,7 @@ function App() {
             onInput={(e) => validateHealthNumber(parseInt(e.target.value, 10))}
           /> <br></br>
 
-          <label for="ball">Ball</label> <br></br>
+          <label htmlFor="ball">Ball</label> <br></br>
           <input list="balls" name="ball" placeholder="Example: Poke Ball"/>
           <datalist id="balls">
             <option value="Poke Ball"></option>
@@ -95,7 +127,7 @@ function App() {
             <option value="Ultra Ball"></option>
           </datalist> <br></br>
 
-          <label for="statuses">Status</label> <br></br>
+          <label htmlFor="statuses">Status</label> <br></br>
           <input list="statuses" name="status" placeholder="Example: Burn"/>
           <datalist id="statuses">
             <option value="Burn"></option>
@@ -105,10 +137,18 @@ function App() {
             <option value="Sleep"></option>
           </datalist> <br></br>
 
-          <label for="calc">Show Calculations</label>
+          <label htmlFor="calc">Show Calculations</label>
           <input type="checkbox" value="calc"/> <br></br>
 
-          <p>Results to be implemented</p>
+          {pokemonData === null && <p>Loading...</p>}
+          {pokemonData && pokemonData.image && (
+            <div>
+              <img src={pokemonData.image} alt="Pokemon" />
+            </div>
+          )}
+
+
+
         </form>
 
         <p>
