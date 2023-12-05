@@ -21,13 +21,16 @@ app.get('/pokemon/:name', async (req, res) => {
     if (pokemon.sprites && pokemon.sprites.front_default) {
       const nameData = pokemon.name;
       const imageData = pokemon.sprites.front_default;
+      const weightData = pokemon.weight;
 
       console.log(nameData); // Log the Pokemon name
       console.log(imageData); // Log the image URL
+      console.log(weightData); // Log the weight
 
       res.json({
         name: nameData,
         image: imageData,
+        weight: weightData
         // Add more relevant data if needed
       });
 

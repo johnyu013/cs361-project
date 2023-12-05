@@ -67,6 +67,7 @@ function App() {
             setPokemonData({
               name: response.data.name,
               image: response.data.image,
+              weight: response.data.weight
               // Add other properties as needed
             });
           } else {
