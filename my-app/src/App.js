@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Component } from 'react';
 import axios from 'axios';
+import formulaImage from './formula.svg';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -47,7 +48,7 @@ function App() {
       updateNumberFromRange({ target: { value } });
     } else {
       // Display a pop-up message
-      alert("Health % must be in the range 1-100");
+      alert("Health % must be in the range -100");
     }
   };
 
@@ -105,6 +106,68 @@ function App() {
     }
   };
 
+  // State to hold the selected Pokeball
+  const [selectedBall, setSelectedBall] = useState('Poke Ball');
+
+  // Object to store ball rates
+  const ballRates = {
+    'Poke Ball': 0.75,
+    'Great Ball': 1.5,
+    'Ultra Ball': 2.25,
+  };
+
+  // State to hold the calculated ball rate
+  const [ballRate, setBallRate] = useState(ballRates['Poke Ball']);
+
+  // Function to update the selected Pokeball and calculate the ball rate
+  const updateSelectedBall = (event) => {
+    const selectedBall = event.target.value;
+    setSelectedBall(selectedBall);
+    setBallRate(ballRates[selectedBall]);
+  };
+
+  // State to hold the selected status
+  const [selectedStatus, setSelectedStatus] = useState('None');
+
+  // Object to store status rates
+  const statusRates = {
+    'None': 1, // Add a default value for 'None
+    'Burn': 1.5,
+    'Freeze': 2,
+    'Paralysis': 1.5,
+    'Poison': 1.5,
+    'Sleep': 2,
+  };
+
+  // State to hold the calculated status rate
+  const [statusRate, setStatusRate] = useState(statusRates['None']);
+
+  // Function to update the selected status and calculate the status rate
+  const updateSelectedStatus = (event) => {
+    const selectedStatus = event.target.value;
+    setSelectedStatus(selectedStatus);
+    setStatusRate(statusRates[selectedStatus]);
+  };
+
+  // State to hold the value of the "Show More Info" checkbox
+  const [showInfo, setShowInfo] = useState(false);
+
+  // Function to toggle the "Show More Info" checkbox state
+  const toggleShowInfo = () => {
+    setShowInfo(!showInfo);
+  };
+
+  // Function to calculate the result based on the formula
+  const calculateResult = () => {
+    // Ensure all required values are available
+    if (ballRate && statusRate && healthValue && pokemonData && pokemonData.weight) {
+      const result = (((3 * 100 - 2 * healthValue) / (3 * 100)) * pokemonData.weight * ballRate * statusRate) / 255;
+      return result.toFixed(2); // Adjust decimal places as needed
+    }
+
+    return "N/A"; // Display "N/A" if any value is missing
+  };
+
   return (
     <ErrorBoundary>
       <div className="App">
@@ -151,29 +214,53 @@ function App() {
             /> <br></br>
 
             <label htmlFor="ball">Ball</label> <br></br>
-            <input list="balls" name="ball" placeholder="Poke Ball"/>
-            <datalist id="balls">
-              <option value="Poke Ball"></option>
-              <option value="Great Ball"></option>
-              <option value="Ultra Ball"></option>
-            </datalist> <br></br>
+            <select
+              id="ballSelect"
+              name="ball"
+              value={selectedBall}
+              onChange={updateSelectedBall}
+            >
+              <option value="Poke Ball">Poke Ball</option>
+              <option value="Great Ball">Great Ball</option>
+              <option value="Ultra Ball">Ultra Ball</option>
+            </select> <br></br>
 
             <label htmlFor="statuses">Status</label> <br></br>
-            <input list="statuses" name="status" placeholder="Burn"/>
-            <datalist id="statuses">
-              <option value="Burn"></option>
-              <option value="Freeze"></option>
-              <option value="Paralysis"></option>
-              <option value="Poison"></option>
-              <option value="Sleep"></option>
-            </datalist> <br></br>
+            <select
+              id="statusSelect"
+              name="status"
+              value={selectedStatus}
+              onChange={updateSelectedStatus}
+            >
+              <option value="None">None</option>
+              <option value="Burn">Burn</option>
+              <option value="Freeze">Freeze</option>
+              <option value="Paralysis">Paralysis</option>
+              <option value="Poison">Poison</option>
+              <option value="Sleep">Sleep</option>
+            </select> <br></br>
 
             <label htmlFor="calc">Show More Info</label>
-            <input type="checkbox" value="calc"/> <br></br>
+            <input
+              type="checkbox"
+              id="showInfoCheckbox"
+              checked={showInfo}
+              onChange={toggleShowInfo}
+            /> <br></br>
 
             {pokemonData && pokemonData.image && (
               <img src={pokemonData.image} alt="Pokemon" />
             )}
+
+            {showInfo && (
+              <>
+                <img src={formulaImage} alt="Formula" />
+                <p>Ball Rate: {ballRate}</p>
+                <p>Status Rate: {statusRate}</p>
+              </>
+            )}
+
+            <p>Calculation Result: {calculateResult()}%</p>
 
           </form>
 
