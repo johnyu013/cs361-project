@@ -2,8 +2,6 @@ import React, { useState, useEffect, Component } from 'react';
 import axios from 'axios';
 import formulaImage from './formula.svg';
 
-// Extracted functions to improve readability and maintainability
-
 // Checks if the API response contains the expected data structure
 function isValidApiResponse(response) {
   return response.data && response.data.image;
