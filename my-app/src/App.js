@@ -2,6 +2,57 @@ import React, { useState, useEffect, Component } from 'react';
 import axios from 'axios';
 import formulaImage from './formula.svg';
 
+// Extracted functions to improve readability and maintainability
+
+// Checks if the API response contains the expected data structure
+function isValidApiResponse(response) {
+  return response.data && response.data.image;
+}
+
+// Retrieves the catch rate for a selected Pokeball
+function getBallRate(selectedBall) {
+  const ballRates = {
+    'Poke Ball': 0.75,
+    'Great Ball': 1.5,
+    'Ultra Ball': 2.25,
+  };
+  return ballRates[selectedBall];
+}
+
+// Retrieves the catch rate for a selected status
+function getStatusRate(selectedStatus) {
+  const statusRates = {
+    'None': 1,
+    'Burn': 1.5,
+    'Freeze': 2,
+    'Paralysis': 1.5,
+    'Poison': 1.5,
+    'Sleep': 2,
+  };
+  return statusRates[selectedStatus];
+}
+
+// Validates if the health value is within the valid range (1-100)
+function isHealthValueValid(value) {
+  return value >= 1 && value <= 100;
+}
+
+// Validates if the level value is within the valid range (1-100)
+function isLevelValueValid(value) {
+  return value >= 1 && value <= 100;
+}
+
+// Validates if all necessary values are available for the catch rate calculation
+function areCalculationValuesValid(ballRate, statusRate, healthValue, pokemonData) {
+  return ballRate && statusRate && healthValue && pokemonData && pokemonData.weight;
+}
+
+// Calculates the catch rate based on the provided formula
+function calculateCatchRate(healthValue, pokemonData, ballRate, statusRate) {
+  return (((3 * 100 - 2 * healthValue) / (3 * 100)) * pokemonData.weight * ballRate * statusRate) / 255;
+}
+
+// Error boundary class to catch and handle errors
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -11,47 +62,30 @@ class ErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     this.setState({ hasError: true });
     console.error('Error caught by boundary:', error, errorInfo);
-    // You can log the error or perform other actions here
   }
 
   render() {
     if (this.state.hasError) {
       return <p>Something went wrong. Please try again.</p>;
-      // You can customize the fallback UI here
     }
 
     return this.props.children;
   }
 }
 
+// Main App component
 function App() {
-  // State to hold the value of the health input
+  // State hooks for various values
   const [healthValue, setHealthValue] = useState(100);
-
-  // State to hold the Pokemon data, including the image URL
   const [pokemonData, setPokemonData] = useState(null);
+  const [levelValue, setLevelValue] = useState(1);
+  const [selectedBall, setSelectedBall] = useState('Poke Ball');
+  const [ballRate, setBallRate] = useState(getBallRate(selectedBall));
+  const [selectedStatus, setSelectedStatus] = useState('None');
+  const [statusRate, setStatusRate] = useState(getStatusRate(selectedStatus));
+  const [showInfo, setShowInfo] = useState(false);
 
-  // Function to update the health range input when the number input changes
-  const updateRangeFromNumber = (value) => {
-    setHealthValue(value);
-  };
-
-  // Function to update the health number input when the range input changes
-  const updateNumberFromRange = (event) => {
-    const value = event.target.value;
-    setHealthValue(value);
-  };
-
-  // Function to validate and enforce the 1-100 range for the health number input
-  const validateHealthNumber = (value) => {
-    if (value >= 1 && value <= 100) {
-      updateNumberFromRange({ target: { value } });
-    } else {
-      // Display a pop-up message
-      alert("Health % must be in the range -100");
-    }
-  };
-
+  // Effect hook to handle fetching Pokemon data on input blur
   useEffect(() => {
     const pokemonInput = document.getElementById("pokemonInput");
 
@@ -63,22 +97,19 @@ function App() {
 
           console.log('API Response:', response);
 
-          // Check if the response contains the expected data structure
-          if (response.data && response.data.image) {
+          if (isValidApiResponse(response)) {
             setPokemonData({
               name: response.data.name,
               image: response.data.image,
               weight: response.data.weight
-              // Add other properties as needed
             });
           } else {
             console.error('Invalid data structure in API response:', response);
             setPokemonData(null);
           }
-          
         } catch (error) {
           console.error('Error fetching Pokemon data:', error);
-          console.log('Error response:', error.response); // Log the error response
+          console.log('Error response:', error.response);
           setPokemonData(null);
         }
       } else {
@@ -93,81 +124,59 @@ function App() {
     };
   }, []);
 
-  // State to hold the value of the level input
-  const [levelValue, setLevelValue] = useState(1);
+  // Functions for updating various values
+  const updateRangeFromNumber = (value) => {
+    setHealthValue(value);
+  };
 
-  // Function to update the level input value
+  const updateNumberFromRange = (event) => {
+    const value = event.target.value;
+    setHealthValue(value);
+  };
+
+  const validateHealthNumber = (value) => {
+    if (isHealthValueValid(value)) {
+      updateNumberFromRange({ target: { value } });
+    } else {
+      alert("Health % must be in the range 1-100");
+    }
+  };
+
   const updateLevelValue = (value) => {
-    if (value >= 1 && value <= 100) {
+    if (isLevelValueValid(value)) {
       setLevelValue(value);
     } else {
-      // Display a pop-up message
       alert("Level must be in the range 1-100");
     }
   };
 
-  // State to hold the selected Pokeball
-  const [selectedBall, setSelectedBall] = useState('Poke Ball');
-
-  // Object to store ball rates
-  const ballRates = {
-    'Poke Ball': 0.75,
-    'Great Ball': 1.5,
-    'Ultra Ball': 2.25,
-  };
-
-  // State to hold the calculated ball rate
-  const [ballRate, setBallRate] = useState(ballRates['Poke Ball']);
-
-  // Function to update the selected Pokeball and calculate the ball rate
   const updateSelectedBall = (event) => {
     const selectedBall = event.target.value;
     setSelectedBall(selectedBall);
-    setBallRate(ballRates[selectedBall]);
+    setBallRate(getBallRate(selectedBall));
   };
 
-  // State to hold the selected status
-  const [selectedStatus, setSelectedStatus] = useState('None');
-
-  // Object to store status rates
-  const statusRates = {
-    'None': 1, // Add a default value for 'None
-    'Burn': 1.5,
-    'Freeze': 2,
-    'Paralysis': 1.5,
-    'Poison': 1.5,
-    'Sleep': 2,
-  };
-
-  // State to hold the calculated status rate
-  const [statusRate, setStatusRate] = useState(statusRates['None']);
-
-  // Function to update the selected status and calculate the status rate
   const updateSelectedStatus = (event) => {
     const selectedStatus = event.target.value;
     setSelectedStatus(selectedStatus);
-    setStatusRate(statusRates[selectedStatus]);
+    setStatusRate(getStatusRate(selectedStatus));
   };
 
-  // State to hold the value of the "Show More Info" checkbox
-  const [showInfo, setShowInfo] = useState(false);
-
-  // Function to toggle the "Show More Info" checkbox state
   const toggleShowInfo = () => {
     setShowInfo(!showInfo);
   };
 
-  // Function to calculate the result based on the formula
+  // Function to calculate and display the catch rate result
   const calculateResult = () => {
-    // Ensure all required values are available
-    if (ballRate && statusRate && healthValue && pokemonData && pokemonData.weight) {
-      const result = (((3 * 100 - 2 * healthValue) / (3 * 100)) * pokemonData.weight * ballRate * statusRate) / 255;
-      return result.toFixed(2); // Adjust decimal places as needed
+    if (areCalculationValuesValid(ballRate, statusRate, healthValue, pokemonData)) {
+      const result = calculateCatchRate(healthValue, pokemonData, ballRate, statusRate);
+      return result.toFixed(2);
     }
 
-    return "N/A"; // Display "N/A" if any value is missing
+    return "N/A";
   };
 
+  // JSX structure for rendering the component
   return (
     <ErrorBoundary>
       <div className="App">
@@ -176,12 +185,13 @@ function App() {
             <strong>Pokemon Catch Rate Calculator using its weight instead!</strong>
           </h1>
           <form>
-            <label>Pokemon</label> <label>Level</label><br></br>
+            {/* Input fields for Pokemon and Level */}
+            <label>Pokemon</label> <label>Level</label><br />
             <input
               type="text"
               name="pokemon"
               placeholder="Pikachu"
-              id="pokemonInput"  // Add an id for the Pokemon name input
+              id="pokemonInput"
             />
             <input
               type="number"
@@ -190,9 +200,10 @@ function App() {
               max="100"
               value={levelValue}
               onInput={(e) => updateLevelValue(parseInt(e.target.value, 10))}
-            /> <br></br>
+            /> <br />
 
-            <label htmlFor="health">Health %</label> <br></br>
+            {/* Input fields for Health */}
+            <label htmlFor="health">Health %</label> <br />
             <input
               type="range"
               id="healthRange"
@@ -211,9 +222,10 @@ function App() {
               value={healthValue}
               placeholder="%"
               onInput={(e) => validateHealthNumber(parseInt(e.target.value, 10))}
-            /> <br></br>
+            /> <br />
 
-            <label htmlFor="ball">Ball</label> <br></br>
+            {/* Dropdown for Pokeball selection */}
+            <label htmlFor="ball">Ball</label> <br />
             <select
               id="ballSelect"
               name="ball"
@@ -223,9 +235,10 @@ function App() {
               <option value="Poke Ball">Poke Ball</option>
               <option value="Great Ball">Great Ball</option>
               <option value="Ultra Ball">Ultra Ball</option>
-            </select> <br></br>
+            </select> <br />
 
-            <label htmlFor="statuses">Status</label> <br></br>
+            {/* Dropdown for Status selection */}
+            <label htmlFor="statuses">Status</label> <br />
             <select
               id="statusSelect"
               name="status"
@@ -238,20 +251,23 @@ function App() {
               <option value="Paralysis">Paralysis</option>
               <option value="Poison">Poison</option>
               <option value="Sleep">Sleep</option>
-            </select> <br></br>
+            </select> <br />
 
+            {/* Checkbox for displaying additional info */}
             <label htmlFor="calc">Show More Info</label>
             <input
               type="checkbox"
               id="showInfoCheckbox"
               checked={showInfo}
               onChange={toggleShowInfo}
-            /> <br></br>
+            /> <br />
 
+            {/* Display Pokemon image if available */}
             {pokemonData && pokemonData.image && (
               <img src={pokemonData.image} alt="Pokemon" />
             )}
 
+            {/* Display additional info if Show More Info checkbox is checked */}
             {showInfo && (
               <>
                 <img src={formulaImage} alt="Formula" />
@@ -260,10 +276,12 @@ function App() {
               </>
             )}
 
+            {/* Display the calculated catch rate result */}
             <p>Calculation Result: {calculateResult()}%</p>
 
           </form>
 
+          {/* Copyright information */}
           <p>
             © John Tran <a href="https://github.com/johnyu013/cs361-project">Update Logs</a>
           </p>

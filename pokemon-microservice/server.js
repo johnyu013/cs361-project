@@ -15,8 +15,6 @@ app.get('/pokemon/:name', async (req, res) => {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
     const pokemon = response.data;
 
-    // console.log('Pokemon Data:', pokemon);
-
     // Check if the response includes the expected properties
     if (pokemon.sprites && pokemon.sprites.front_default) {
       const nameData = pokemon.name;
