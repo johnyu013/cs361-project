@@ -263,7 +263,7 @@ function App() {
             {/* Display Pokemon image if available */}
             {pokemonData && pokemonData.image && (
               <img src={pokemonData.image} alt='Pokemon' />
-            )}
+            )} <br />
 
             {/* Display additional info if Show More Info checkbox is checked */}
             {showInfo && (
