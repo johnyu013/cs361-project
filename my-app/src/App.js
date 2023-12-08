@@ -85,7 +85,7 @@ function App() {
 
   // Effect hook to handle fetching Pokemon data on input blur
   useEffect(() => {
-    const pokemonInput = document.getElementById("pokemonInput");
+    const pokemonInput = document.getElementById('pokemonInput');
 
     const handleInputBlur = async () => {
       const pokemonName = pokemonInput.value.trim();
@@ -115,10 +115,10 @@ function App() {
       }
     };
 
-    pokemonInput.addEventListener("blur", handleInputBlur);
+    pokemonInput.addEventListener('blur', handleInputBlur);
 
     return () => {
-      pokemonInput.removeEventListener("blur", handleInputBlur);
+      pokemonInput.removeEventListener('blur', handleInputBlur);
     };
   }, []);
 
@@ -136,7 +136,7 @@ function App() {
     if (isHealthValueValid(value)) {
       updateNumberFromRange({ target: { value } });
     } else {
-      alert("Health % must be in the range 1-100");
+      alert('Health % must be in the range 1-100');
     }
   };
 
@@ -144,7 +144,7 @@ function App() {
     if (isLevelValueValid(value)) {
       setLevelValue(value);
     } else {
-      alert("Level must be in the range 1-100");
+      alert('Level must be in the range 1-100');
     }
   };
 
@@ -171,14 +171,14 @@ function App() {
       return result.toFixed(2);
     }
 
-    return "N/A";
+    return 'N/A';
   };
 
   // JSX structure for rendering the component
   return (
     <ErrorBoundary>
-      <div className="App">
-        <header className="App-header">
+      <div className='App'>
+        <header className='App-header'>
           <h1>
             <strong>Pokemon Catch Rate Calculator using its weight instead!</strong>
           </h1>
@@ -186,89 +186,89 @@ function App() {
             {/* Input fields for Pokemon and Level */}
             <label>Pokemon</label> <label>Level</label><br />
             <input
-              type="text"
-              name="pokemon"
-              placeholder="Pikachu"
-              id="pokemonInput"
+              type='text'
+              name='pokemon'
+              placeholder='Pikachu'
+              id='pokemonInput'
             />
             <input
-              type="number"
-              name="level"
-              min="1"
-              max="100"
+              type='number'
+              name='level'
+              min='1'
+              max='100'
               value={levelValue}
               onInput={(e) => updateLevelValue(parseInt(e.target.value, 10))}
             /> <br />
 
             {/* Input fields for Health */}
-            <label htmlFor="health">Health %</label> <br />
+            <label htmlFor='health'>Health %</label> <br />
             <input
-              type="range"
-              id="healthRange"
-              name="health"
-              min="1"
-              max="100"
+              type='range'
+              id='healthRange'
+              name='health'
+              min='1'
+              max='100'
               value={healthValue}
               onInput={(e) => updateRangeFromNumber(e.target.value)}
             />
             <input
-              type="number"
-              id="healthNumber"
-              name="health"
-              min="1"
-              max="100"
+              type='number'
+              id='healthNumber'
+              name='health'
+              min='1'
+              max='100'
               value={healthValue}
-              placeholder="%"
+              placeholder='%'
               onInput={(e) => validateHealthNumber(parseInt(e.target.value, 10))}
             /> <br />
 
             {/* Dropdown for Pokeball selection */}
-            <label htmlFor="ball">Ball</label> <br />
+            <label htmlFor='ball'>Ball</label> <br />
             <select
-              id="ballSelect"
-              name="ball"
+              id='ballSelect'
+              name='ball'
               value={selectedBall}
               onChange={updateSelectedBall}
             >
-              <option value="Poke Ball">Poke Ball</option>
-              <option value="Great Ball">Great Ball</option>
-              <option value="Ultra Ball">Ultra Ball</option>
+              <option value='Poke Ball'>Poke Ball</option>
+              <option value='Great Ball'>Great Ball</option>
+              <option value='Ultra Ball'>Ultra Ball</option>
             </select> <br />
 
             {/* Dropdown for Status selection */}
-            <label htmlFor="statuses">Status</label> <br />
+            <label htmlFor='statuses'>Status</label> <br />
             <select
-              id="statusSelect"
-              name="status"
+              id='statusSelect'
+              name='status'
               value={selectedStatus}
               onChange={updateSelectedStatus}
             >
-              <option value="None">None</option>
-              <option value="Burn">Burn</option>
-              <option value="Freeze">Freeze</option>
-              <option value="Paralysis">Paralysis</option>
-              <option value="Poison">Poison</option>
-              <option value="Sleep">Sleep</option>
+              <option value='None'>None</option>
+              <option value='Burn'>Burn</option>
+              <option value='Freeze'>Freeze</option>
+              <option value='Paralysis'>Paralysis</option>
+              <option value='Poison'>Poison</option>
+              <option value='Sleep'>Sleep</option>
             </select> <br />
 
             {/* Checkbox for displaying additional info */}
-            <label htmlFor="calc">Show More Info</label>
+            <label htmlFor='calc'>Show More Info</label>
             <input
-              type="checkbox"
-              id="showInfoCheckbox"
+              type='checkbox'
+              id='showInfoCheckbox'
               checked={showInfo}
               onChange={toggleShowInfo}
             /> <br />
 
             {/* Display Pokemon image if available */}
             {pokemonData && pokemonData.image && (
-              <img src={pokemonData.image} alt="Pokemon" />
+              <img src={pokemonData.image} alt='Pokemon' />
             )}
 
             {/* Display additional info if Show More Info checkbox is checked */}
             {showInfo && (
               <>
-                <img src={formulaImage} alt="Formula" />
+                <img src={formulaImage} alt='Formula' />
                 <p>Ball Rate: {ballRate}</p>
                 <p>Status Rate: {statusRate}</p>
               </>
@@ -281,7 +281,7 @@ function App() {
 
           {/* Copyright information */}
           <p>
-            © John Tran <a href="https://github.com/johnyu013/cs361-project">Update Logs</a>
+            © John Tran <a href='https://github.com/johnyu013/cs361-project'>Update Logs</a>
           </p>
         </header>
       </div>
